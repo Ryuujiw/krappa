@@ -43,6 +43,7 @@ async def on_message(message):
                 if hasattr(emote.emoji, 'name') and emote.emoji.name.lower() == emote_to_check:
                     data = data.append({'author': msg.author.name,
                     'message': msg.content,
+                    'message_url': msg.jump_url,
                     'reactions' : emote.count,
                     'time': msg.created_at},
                     ignore_index=True)
@@ -60,12 +61,12 @@ async def on_message(message):
 
     for winner in winners:
         embed.add_field(name="Author", value=winner['author'])
-        embed.add_field(name="Message", value=winner['message'])
+        embed.add_field(name="Message", value='[%s](%s)'%(winner['message'],winner['message_url']))
         embed.add_field(name= emote_to_check + "'d", value=winner['reactions'])
         embed.add_field(name="Time", value=winner['time'])
         embed.add_field(name = chr(173), value = chr(173))
         embed.add_field(name = chr(173), value = chr(173))
-
+        
     await message.channel.send(embed=embed)
 
 client.run(TOKEN)
