@@ -14,6 +14,28 @@ GUILD = os.getenv('DISCORD_SERVER')
 
 client = discord.Client()
 
+def generate_image(winners):
+    if len(winners) <= 0:
+        return False
+    elif len(winners) <= 3:
+        # init winners' podium
+        podium = Image.open(".assets/podium.png")
+        size = (80,80)
+        for index, winner in enumerate(winners):
+            # create winners' podium
+            winner = Image.open(requests.get(winner['avatar_url'], stream=True).raw)
+            resized_avatar = winner.resize(size)
+            # first, second and third place
+            podium.paste(resized_avatar,(375,40))
+            podium.paste(resized_avatar,(120,110))  if index == 1 else None
+            podium.paste(resized_avatar,(605,50))   if index == 2 else None
+
+        podium.save('.assets/winners.png')
+        return True
+    else:
+        ### another winners image
+        return False
+
 @client.event
 async def on_ready():
     print('krappa is now online')
@@ -58,14 +80,10 @@ async def on_message(message):
     # store winners into a csv
     winners = nominees.to_dict('records')
 
-    # init winners' podium
-    podium = Image.open(".assets/podium.png")
-    size = (80,80)        
-
     # init embed
     embed = discord.Embed(title= emote_to_check + " of the month", color=0x00ff00)
 
-    for index, winner in enumerate(winners):
+    for winner in winners:
         embed.add_field(name="Author", value=winner['author'])
         embed.add_field(name="Message", value='[%s](%s)'%(winner['message'],winner['message_url']))
         embed.add_field(name= emote_to_check + "'d", value=winner['reactions'])
@@ -73,16 +91,7 @@ async def on_message(message):
         embed.add_field(name = chr(173), value = chr(173))
         embed.add_field(name = chr(173), value = chr(173))
 
-        # create winners' podium
-        winner = Image.open(requests.get(winner['avatar_url'], stream=True).raw)
-        resized_avatar = winner.resize(size)
-        # first, second and third place
-        podium.paste(resized_avatar,(375,40))
-        podium.paste(resized_avatar,(120,110))  if index == 1 else None
-        podium.paste(resized_avatar,(605,50))   if index == 2 else None
-        podium.save('.assets/winners.png')
-
-    file = discord.File(".assets/winners.png", filename="image.png") if len(winners) > 0 else None
+    file = discord.File(".assets/winners.png", filename="image.png") if generate_image(winners) == True else None
     embed.set_image(url="attachment://image.png")
         
     await message.channel.send(file=file, embed=embed)
