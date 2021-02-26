@@ -76,7 +76,7 @@ async def on_message(message):
         # create winners' podium
         winner = Image.open(requests.get(winner['avatar_url'], stream=True).raw)
         resized_avatar = winner.resize(size)
-        # first, second and runner-up
+        # first, second and third place
         podium.paste(resized_avatar,(375,40))
         podium.paste(resized_avatar,(120,110))  if index == 1 else None
         podium.paste(resized_avatar,(605,50))   if index == 2 else None
