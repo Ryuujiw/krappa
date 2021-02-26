@@ -59,7 +59,7 @@ async def on_message(message):
     winners = nominees.to_dict('records')
 
     # init winners' podium
-    podium = Image.open("tmp/podium.png")
+    podium = Image.open(".assets/podium.png")
     size = (80,80)        
 
     # init embed
@@ -80,9 +80,9 @@ async def on_message(message):
         podium.paste(resized_avatar,(375,40))
         podium.paste(resized_avatar,(120,110))  if index == 1 else None
         podium.paste(resized_avatar,(605,50))   if index == 2 else None
-        podium.save('tmp/winners.png')
+        podium.save('.assets/winners.png')
 
-    file = discord.File("tmp/winners.png", filename="image.png") if len(winners) > 0 else None
+    file = discord.File(".assets/winners.png", filename="image.png") if len(winners) > 0 else None
     embed.set_image(url="attachment://image.png")
         
     await message.channel.send(file=file, embed=embed)
