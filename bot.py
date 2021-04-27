@@ -30,7 +30,7 @@ def generate_image(winners):
             podium.paste(resized_avatar,(120,110))  if index == 1 else None
             podium.paste(resized_avatar,(605,50))   if index == 2 else None
 
-        podium.save('.assets/winners.png')
+        podium.save('.assets/tmp/winners.png')
         return True
     else:
         ### another winners image
@@ -91,7 +91,7 @@ async def on_message(message):
         embed.add_field(name = chr(173), value = chr(173))
         embed.add_field(name = chr(173), value = chr(173))
 
-    file = discord.File(".assets/winners.png", filename="image.png") if generate_image(winners) == True else None
+    file = discord.File(".assets/tmp/winners.png", filename="image.png") if generate_image(winners) == True else None
     embed.set_image(url="attachment://image.png")
         
     await message.channel.send(file=file, embed=embed)
