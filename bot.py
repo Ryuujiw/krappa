@@ -4,7 +4,7 @@ import re
 from dotenv import load_dotenv
 import asyncio
 import pandas as pd
-import datetime
+from datetime import datetime, timedelta
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -32,8 +32,8 @@ async def on_message(message):
     data = pd.DataFrame(columns=['author', 'message', 'reactions', 'time'])
     
     # get 1st day of current month -> today
-    today = datetime.datetime.today()
-    start_of_the_month = datetime.datetime.today().replace(day=1)
+    today = datetime.today() - timedelta(hours=8)
+    start_of_the_month = datetime.today().replace(day=1, hour=0, minute=0, second=0) - timedelta(hours=8)
     async for msg in message.channel.history(before=today, after=start_of_the_month, limit=None):
         if msg.author != client.user:
             # skip message if has no reactions
