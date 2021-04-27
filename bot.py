@@ -5,12 +5,36 @@ from dotenv import load_dotenv
 import asyncio
 import pandas as pd
 import datetime
+from PIL import Image
+import requests
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_SERVER')
 
 client = discord.Client()
+
+def generate_image(winners):
+    if len(winners) <= 0:
+        return False
+    elif len(winners) <= 3:
+        # init winners' podium
+        podium = Image.open(".assets/podium.png")
+        size = (80,80)
+        for index, winner in enumerate(winners):
+            # create winners' podium
+            winner = Image.open(requests.get(winner['avatar_url'], stream=True).raw)
+            resized_avatar = winner.resize(size)
+            # first, second and third place
+            podium.paste(resized_avatar,(375,40))
+            podium.paste(resized_avatar,(120,110))  if index == 1 else None
+            podium.paste(resized_avatar,(605,50))   if index == 2 else None
+
+        podium.save('.assets/tmp/winners.png')
+        return True
+    else:
+        ### another winners image
+        return False
 
 @client.event
 async def on_ready():
@@ -45,7 +69,8 @@ async def on_message(message):
                     'message': msg.content,
                     'message_url': msg.jump_url,
                     'reactions' : emote.count,
-                    'time': msg.created_at},
+                    'time': msg.created_at,
+                    'avatar_url': msg.author.avatar_url},
                     ignore_index=True)
 
     # find most krappa
@@ -57,7 +82,6 @@ async def on_message(message):
 
     # init embed
     embed = discord.Embed(title= emote_to_check + " of the month", color=0x00ff00)
-    embed.set_thumbnail(url="https://cdn.betterttv.net/emote/58cd3345994bb43c8d300b82/3x")
 
     for winner in winners:
         embed.add_field(name="Author", value=winner['author'])
@@ -66,7 +90,10 @@ async def on_message(message):
         embed.add_field(name="Time", value=winner['time'])
         embed.add_field(name = chr(173), value = chr(173))
         embed.add_field(name = chr(173), value = chr(173))
+
+    file = discord.File(".assets/tmp/winners.png", filename="image.png") if generate_image(winners) == True else None
+    embed.set_image(url="attachment://image.png")
         
-    await message.channel.send(embed=embed)
+    await message.channel.send(file=file, embed=embed)
 
 client.run(TOKEN)
