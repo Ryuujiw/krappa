@@ -72,6 +72,14 @@ async def on_message(message):
                     'time': msg.created_at,
                     'avatar_url': msg.author.avatar_url},
                     ignore_index=True)
+                elif emote.emoji == emote_to_check:
+                    # for default emoji
+                    data = data.append({'author': msg.author.name,
+                    'message': msg.content,
+                    'message_url': msg.jump_url,
+                    'reactions' : emote.count,
+                    'time': msg.created_at},
+                    ignore_index=True)
 
     # find most krappa
     krappa = data['reactions']
