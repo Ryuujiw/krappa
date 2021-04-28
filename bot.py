@@ -78,7 +78,8 @@ async def on_message(message):
                     'message': msg.content,
                     'message_url': msg.jump_url,
                     'reactions' : emote.count,
-                    'time': msg.created_at},
+                    'time': msg.created_at,
+                    'avatar_url': msg.author.avatar_url},
                     ignore_index=True)
 
     # find most krappa
