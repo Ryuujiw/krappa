@@ -21,14 +21,12 @@ def generate_image(winners):
         # init winners' podium
         podium = Image.open(".assets/podium.png")
         size = (80,80)
+        position = [[375,40], [120,110], [605,50]] # avatar position on the image
         for index, winner in enumerate(winners):
             # create winners' podium
             winner = Image.open(requests.get(winner['avatar_url'], stream=True).raw)
             resized_avatar = winner.resize(size)
-            # first, second and third place
-            podium.paste(resized_avatar,(375,40))
-            podium.paste(resized_avatar,(120,110))  if index == 1 else None
-            podium.paste(resized_avatar,(605,50))   if index == 2 else None
+            podium.paste(resized_avatar,position[index])
 
         podium.save('.assets/tmp/winners.png')
         return True
@@ -78,7 +76,8 @@ async def on_message(message):
                     'message': msg.content,
                     'message_url': msg.jump_url,
                     'reactions' : emote.count,
-                    'time': msg.created_at},
+                    'time': msg.created_at,
+                    'avatar_url': msg.author.avatar_url},
                     ignore_index=True)
 
     # find most krappa
