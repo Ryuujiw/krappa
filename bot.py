@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import asyncio
 import pandas as pd
 from datetime import datetime
+import pytz
 from podium import generate_image
 
 load_dotenv()
@@ -29,10 +30,13 @@ async def on_message(message):
     # init dataframe
     data = pd.DataFrame(columns=['author', 'message', 'reactions', 'time'])
     
-    # get 1st day of current month -> today
+    # get query time in utc
     today = datetime.utcnow()
+    # get 1st day of current month in localtime, convert to utc
+    timezone = pytz.timezone('Asia/Kuala_Lumpur')
+    first_day_of_today = (datetime.now(timezone).replace(day=1, hour=0, minute=0, second=0) - datetime.now(timezone).utcoffset()).replace(tzinfo=None)
     
-    async for msg in message.channel.history(before=today, after=today.replace(day=1, hour=0, minute=0, second=0), limit=None):
+    async for msg in message.channel.history(before=today, after=first_day_of_today, limit=None):
         if msg.author != client.user:
             # skip message if has no reactions
             if len(msg.reactions) == 0:
