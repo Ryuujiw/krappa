@@ -7,6 +7,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from PIL import Image
 import requests
+import pytz
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -41,22 +42,21 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    emote_to_check = ''
-
     if message.content.endswith('who'):
         # get the emote
         emote_to_check = message.content.split()[0].lower()
 
-    if emote_to_check == '':
+    if 'emote_to_check' not in vars():
         return
 
     # init dataframe
     data = pd.DataFrame(columns=['author', 'message', 'reactions', 'time'])
     
     # get 1st day of current month -> today
-    today = datetime.today() - timedelta(hours=8)
-    start_of_the_month = datetime.today().replace(day=1, hour=0, minute=0, second=0) - timedelta(hours=8)
-    async for msg in message.channel.history(before=today, after=start_of_the_month, limit=None):
+    timezone = pytz.timezone('Asia/Kuala Lumpur')
+    today = datetime.now(timezone)
+
+    async for msg in message.channel.history(before=today, after=today.replace(day=1, hour=0, minute=0, second=0), limit=None):
         if msg.author != client.user:
             # skip message if has no reactions
             if len(msg.reactions) == 0:
