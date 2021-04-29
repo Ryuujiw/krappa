@@ -1,39 +1,17 @@
 import os
 import discord
-import re
 from dotenv import load_dotenv
 import asyncio
 import pandas as pd
-from datetime import datetime, timedelta
-from PIL import Image
-import requests
+from datetime import datetime
 import pytz
+from podium import generate_image
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_SERVER')
 
 client = discord.Client()
-
-def generate_image(winners):
-    if len(winners) <= 0:
-        return False
-    elif len(winners) <= 3:
-        # init winners' podium
-        podium = Image.open(".assets/podium.png")
-        size = (80,80)
-        position = [[375,40], [120,110], [605,50]] # avatar position on the image
-        for index, winner in enumerate(winners):
-            # create winners' podium
-            winner = Image.open(requests.get(winner['avatar_url'], stream=True).raw)
-            resized_avatar = winner.resize(size)
-            podium.paste(resized_avatar,position[index])
-
-        podium.save('.assets/tmp/winners.png')
-        return True
-    else:
-        ### another winners image
-        return False
 
 @client.event
 async def on_ready():
@@ -53,8 +31,8 @@ async def on_message(message):
     data = pd.DataFrame(columns=['author', 'message', 'reactions', 'time'])
     
     # get 1st day of current month -> today
-    timezone = pytz.timezone('Asia/Kuala Lumpur')
-    today = datetime.now(timezone)
+    timezone = pytz.timezone('Asia/Kuala_Lumpur')
+    today = datetime.now(timezone).replace(tzinfo=None)
 
     async for msg in message.channel.history(before=today, after=today.replace(day=1, hour=0, minute=0, second=0), limit=None):
         if msg.author != client.user:
