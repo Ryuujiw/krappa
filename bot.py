@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import asyncio
 import pandas as pd
 from datetime import datetime
-import pytz
 from podium import generate_image
 
 load_dotenv()
@@ -31,9 +30,8 @@ async def on_message(message):
     data = pd.DataFrame(columns=['author', 'message', 'reactions', 'time'])
     
     # get 1st day of current month -> today
-    timezone = pytz.timezone('Asia/Kuala_Lumpur')
-    today = datetime.now(timezone).replace(tzinfo=None)
-
+    today = datetime.utcnow()
+    
     async for msg in message.channel.history(before=today, after=today.replace(day=1, hour=0, minute=0, second=0), limit=None):
         if msg.author != client.user:
             # skip message if has no reactions
@@ -62,7 +60,7 @@ async def on_message(message):
     krappa = data['reactions']
     nominees = data.loc[krappa == krappa.max()]
 
-    # store winners into a csv
+    # store winners into a dictionary
     winners = nominees.to_dict('records')
 
     # init embed
